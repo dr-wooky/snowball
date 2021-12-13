@@ -33,14 +33,14 @@ class KotlinApplication {
                 for ((key, player) in arenaUpdate.arena.state) {
                     if (key != arenaUpdate._links.self.href) {
                         if (myState!!.y == player.y && Math.abs(myState.x - player.x) <= 3) {
-                            if ((myState.x - player.x) > 0) {
+                            if ((myState.x - player.x) < 0) {
                                 isTargetE = true
                                 if (myState.direction == "E") {
                                     canThrow = true
                                 }
                             } else {
                                 isTargetW = true
-                                if (myState.direction == "E") {
+                                if (myState.direction == "W") {
                                     canThrow = true
                                 }
                             }
