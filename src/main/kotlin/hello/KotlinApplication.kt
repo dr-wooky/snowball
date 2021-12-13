@@ -32,28 +32,28 @@ class KotlinApplication {
 
                 for ((key, player) in arenaUpdate.arena.state) {
                     if (key != arenaUpdate._links.self.href) {
-                        if (myState!!.y == player!!.y && Math.abs(myState!!.x - player!!.x) <= 3) {
-                            if ((myState!!.x - player!!.x) < 0) {
+                        if (myState!!.y == player.y && Math.abs(myState.x - player.x) <= 3) {
+                            if ((myState.x - player.x) < 0) {
                                 isTargetE = true
-                                if (myState!!.direction == "E") {
+                                if (myState.direction == "E") {
                                     canThrow = true
                                 }
                             } else {
                                 isTargetW = true
-                                if (myState!!.direction == "E") {
+                                if (myState.direction == "E") {
                                     canThrow = true
                                 }
                             }
                         }
-                        if (myState!!.x == player!!.x && Math.abs(myState!!.y - player!!.y) <= 3) {
-                            if ((myState!!.y - player!!.y) < 0) {
+                        if (myState.x == player.x && Math.abs(myState.y - player.y) <= 3) {
+                            if ((myState.y - player.y) < 0) {
                                 isTargetN = true
-                                if (myState!!.direction == "N") {
+                                if (myState.direction == "N") {
                                     canThrow = true
                                 }
                             } else {
                                 isTargetS = true
-                                if (myState!!.direction == "S") {
+                                if (myState.direction == "S") {
                                     canThrow = true
                                 }
                             }
@@ -68,28 +68,28 @@ class KotlinApplication {
                 if (!canThrow) {
                     if (
                         (myState!!.direction == "N" && isTargetE) || 
-                        (myState!!.direction == "E" && isTargetS) || 
-                        (myState!!.direction == "S" && isTargetW) || 
-                        (myState!!.direction == "W" && isTargetN) 
+                        (myState.direction == "E" && isTargetS) ||
+                        (myState.direction == "S" && isTargetW) ||
+                        (myState.direction == "W" && isTargetN)
                     ) {
                         move = "R"
                     }
                     if (
-                        move == T && (
-                            (myState!!.direction == "N" && isTargetW) || 
-                            (myState!!.direction == "W" && isTargetS) || 
-                            (myState!!.direction == "S" && isTargetE) || 
-                            (myState!!.direction == "E" && isTargetN) 
+                        move == "T" && (
+                            (myState.direction == "N" && isTargetW) ||
+                            (myState.direction == "W" && isTargetS) ||
+                            (myState.direction == "S" && isTargetE) ||
+                            (myState.direction == "E" && isTargetN)
                         )
                     ) {
                         move = "L"
                     }
                     if ( move == "T") {
                         if (
-                            (myState!!.direction == "N" && isTargetS) || 
-                            (myState!!.direction == "W" && isTargetE) || 
-                            (myState!!.direction == "S" && isTargetN) || 
-                            (myState!!.direction == "E" && isTargetW) 
+                            (myState.direction == "N" && isTargetS) ||
+                            (myState.direction == "W" && isTargetE) ||
+                            (myState.direction == "S" && isTargetN) ||
+                            (myState.direction == "E" && isTargetW)
                         ) {
                             move = "L"
                         } else {
