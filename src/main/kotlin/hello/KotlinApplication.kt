@@ -1,5 +1,11 @@
 package hello
 
+import ch.qos.logback.classic.db.names.TableName
+import com.google.api.core.ApiFuture
+import com.google.cloud.ServiceOptions
+import com.google.cloud.bigquery.storage.v1.*
+import org.json.JSONArray
+import org.json.JSONObject
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -8,9 +14,18 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
+import java.time.Instant
+
 
 @SpringBootApplication
 class KotlinApplication {
+
+
+    val projectId: String = ServiceOptions.getDefaultProjectId()
+    val datasetName = "snowball"
+    val tableName = "events"
+
+    var writeCommittedStream: WriteCommittedStream? = null
 
     @Bean
     fun routes() = router {
@@ -98,7 +113,43 @@ class KotlinApplication {
                     }
                 }
 
+                writeCommittedStream = WriteCommittedStream(projectId, datasetName, tableName)
+                writeCommittedStream?.send(arenaUpdate.arena)
                 ServerResponse.ok().body(Mono.just(move))
+            }
+        }
+    }
+
+    class WriteCommittedStream(projectId: String?, datasetName: String?, tableName: String?) {
+        var jsonStreamWriter: JsonStreamWriter? = null
+        fun send(arena: Arena): ApiFuture<AppendRowsResponse> {
+            val now = Instant.now()
+            val jsonArray = JSONArray()
+            arena.state.forEach { (url: String?, playerState: PlayerState) ->
+                val jsonObject = JSONObject()
+                jsonObject.put("x", playerState.x)
+                jsonObject.put("y", playerState.y)
+                jsonObject.put("direction", playerState.direction)
+                jsonObject.put("wasHit", playerState.wasHit)
+                jsonObject.put("score", playerState.score)
+                jsonObject.put("player", url)
+                jsonObject.put("timestamp", now.epochSecond * 1000 * 1000)
+                jsonArray.put(jsonObject)
+            }
+            return jsonStreamWriter.append(jsonArray)
+        }
+
+        init {
+            BigQueryWriteClient.create().use { client ->
+                val stream: WriteStream = WriteStream.newBuilder().setType(WriteStream.Type.COMMITTED).build()
+                val parentTable: TableName = TableName.of(projectId, datasetName, tableName)
+                val createWriteStreamRequest: CreateWriteStreamRequest = CreateWriteStreamRequest.newBuilder()
+                    .setParent(parentTable.toString())
+                    .setWriteStream(stream)
+                    .build()
+                val writeStream: WriteStream = client.createWriteStream(createWriteStreamRequest)
+                jsonStreamWriter =
+                    JsonStreamWriter.newBuilder(writeStream.getName(), writeStream.getTableSchema()).build()
             }
         }
     }
