@@ -33,7 +33,7 @@ class KotlinApplication {
                 for ((key, player) in arenaUpdate.arena.state) {
                     if (key != arenaUpdate._links.self.href) {
                         if (myState!!.y == player.y && Math.abs(myState.x - player.x) <= 3) {
-                            if ((myState.x - player.x) < 0) {
+                            if ((myState.x - player.x) > 0) {
                                 isTargetE = true
                                 if (myState.direction == "E") {
                                     canThrow = true
@@ -46,7 +46,7 @@ class KotlinApplication {
                             }
                         }
                         if (myState.x == player.x && Math.abs(myState.y - player.y) <= 3) {
-                            if ((myState.y - player.y) < 0) {
+                            if ((myState.y - player.y) > 0) {
                                 isTargetN = true
                                 if (myState.direction == "N") {
                                     canThrow = true
